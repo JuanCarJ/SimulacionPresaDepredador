@@ -1,0 +1,8 @@
+[package]
+name = "simulador_ecosistema_presa_depredador"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+macroquad = "0.4.5"
+rand = "0.8.5"
