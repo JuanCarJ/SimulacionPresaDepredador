@@ -9,6 +9,25 @@ use macroquad::prelude::*;
 mod entidades;
 mod simulacion;
 
+/// Dibuja una leyenda en la esquina superior derecha para identificar los colores.
+fn dibujar_leyenda() {
+    let x_offset = screen_width() - 150.0;
+    let y_offset = 20.0;
+    let rect_size = 15.0;
+    let text_offset = rect_size + 5.0;
+    let text_color = DARKGRAY;
+    let font_size = 18.0;
+
+    // Leyenda Conejo
+    draw_circle(x_offset + rect_size / 2.0, y_offset + rect_size / 2.0, rect_size / 2.0, WHITE);
+    draw_text("Conejo", x_offset + text_offset, y_offset + rect_size / 2.0 + font_size / 2.0 - 5.0, font_size, text_color);
+
+    // Leyenda Cabra
+    draw_circle(x_offset + rect_size / 2.0, y_offset + rect_size / 2.0 + rect_size + 10.0, rect_size / 2.0, BROWN);
+    draw_text("Cabra", x_offset + text_offset, y_offset + rect_size / 2.0 + rect_size + 10.0 + font_size / 2.0 - 5.0, font_size, text_color);
+}
+
+
 /// Dibuja el estado actual de la simulación en la pantalla.
 fn dibujar_simulacion(sim: &simulacion::Simulacion) {
     clear_background(Color::from_rgba(135, 206, 235, 255)); // Sky Blue
@@ -34,20 +53,51 @@ fn dibujar_simulacion(sim: &simulacion::Simulacion) {
         draw_circle(x, y, radio, color);
     }
     
-    // Dibuja al depredador como un círculo rojo en la parte superior.
+    // Dibuja al depredador, cambiando de color según su estado de alimentación.
     if sim.depredador.vivo {
-        draw_circle(screen_width() / 2.0, 50.0, 20.0, RED);
+        let depredador_color = if sim.depredador.reserva_comida_kg >= entidades::DEPREDADOR_CONSUMO_OPTIMO_DIARIO_KG {
+            RED // Óptimo
+        } else if sim.depredador.reserva_comida_kg >= entidades::DEPREDADOR_CONSUMO_MINIMO_DIARIO_KG {
+            ORANGE // Mínimo
+        } else {
+            DARKGRAY // Peligro de muerte
+        };
+        draw_circle(screen_width() / 2.0, 50.0, 20.0, depredador_color);
     }
 
     // Muestra las estadísticas de la simulación como texto.
-    let font_size = 24.0;
-    let texto_dia = format!("Día: {}", sim.dia);
-    let texto_presas = format!("Población: {}", sim.presas.len());
-    let texto_comida = format!("Reserva Depredador: {:.1} kg", sim.depredador.reserva_comida_kg);
-    
-    draw_text(&texto_dia, 10.0, 20.0, font_size, DARKGRAY);
-    draw_text(&texto_presas, 10.0, 45.0, font_size, DARKGRAY);
-    draw_text(&texto_comida, 10.0, 70.0, font_size, DARKGRAY);
+    let font_size = 20.0;
+    let mut current_y = 20.0;
+
+    // Información general
+    draw_text(&format!("Día: {}", sim.dia), 10.0, current_y, font_size, DARKGRAY);
+    current_y += 25.0;
+
+    // Conteo de especies
+    let (conejos, cabras) = sim.contar_especies();
+    draw_text(&format!("Conejos: {}", conejos), 10.0, current_y, font_size, DARKGRAY);
+    current_y += 25.0;
+    draw_text(&format!("Cabras: {}", cabras), 10.0, current_y, font_size, DARKGRAY);
+    current_y += 25.0;
+    draw_text(&format!("Población Total: {}", sim.presas.len()), 10.0, current_y, font_size, DARKGRAY);
+    current_y += 25.0;
+
+
+    // Estado del depredador
+    draw_text(&format!("Reserva Depredador: {:.1} kg", sim.depredador.reserva_comida_kg), 10.0, current_y, font_size, DARKGRAY);
+    current_y += 25.0;
+
+    if sim.depredador.vivo {
+        let estado_depredador = if sim.depredador.reserva_comida_kg >= entidades::DEPREDADOR_CONSUMO_OPTIMO_DIARIO_KG {
+            "Estado: Óptimo"
+        } else if sim.depredador.reserva_comida_kg >= entidades::DEPREDADOR_CONSUMO_MINIMO_DIARIO_KG {
+            "Estado: Mínimo"
+        } else {
+            "Estado: Peligro"
+        };
+        draw_text(estado_depredador, 10.0, current_y, font_size, DARKGRAY);
+    }
+
 
     // Muestra un mensaje de fin de juego si el depredador muere.
     if !sim.depredador.vivo {
@@ -56,11 +106,14 @@ fn dibujar_simulacion(sim: &simulacion::Simulacion) {
         draw_text(texto_fin, screen_width() / 2.0 - text_dims.width / 2.0, screen_height() / 2.0, 40.0, BLACK);
     }
      // Muestra un mensaje si las presas se extinguen.
-     if sim.presas.is_empty() && sim.depredador.vivo{
+     if sim.presas.is_empty() && sim.depredador.vivo {
         let texto_fin = "¡LAS PRESAS SE HAN EXTINGUIDO!";
         let text_dims = measure_text(texto_fin, None, 40, 1.0);
         draw_text(texto_fin, screen_width() / 2.0 - text_dims.width / 2.0, screen_height() / 2.0, 40.0, BLACK);
     }
+
+    // Dibuja la leyenda al final para que esté en primer plano.
+    dibujar_leyenda();
 }
 
 /// Punto de entrada de la aplicación, marcado para ser ejecutado por macroquad.

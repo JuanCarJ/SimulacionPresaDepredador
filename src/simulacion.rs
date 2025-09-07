@@ -1,4 +1,4 @@
-// src/simulacion.rs
+// src/simulacion.rs (Corregido)
 
 // Este módulo actúa como el "corazón" o "motor" de la simulación.
 // Orquesta las interacciones entre las entidades y gestiona el paso del tiempo.
@@ -43,8 +43,10 @@ impl Simulacion {
 
     /// Avanza la simulación un día, ejecutando todas las fases en orden.
     pub fn avanzar_dia(&mut self) {
-        // Si la simulación ya terminó (depredador muerto o presas extintas), no hace nada.
-        if !self.depredador.vivo || self.presas.is_empty() {
+        // ===== CAMBIO CLAVE =====
+        // La simulación ahora solo se detiene si el depredador muere.
+        // Continuará incluso si no hay presas.
+        if !self.depredador.vivo {
             return;
         }
 
@@ -56,7 +58,10 @@ impl Simulacion {
         // El depredador consume su reserva y, si está vivo, intenta cazar.
         self.depredador.consumir_reserva();
         if self.depredador.vivo {
-            self.depredador.cazar(&mut self.presas, &mut rng);
+            // Solo intentará cazar si todavía hay presas.
+            if !self.presas.is_empty() {
+                self.depredador.cazar(&mut self.presas, &mut rng);
+            }
         }
 
         // --- FASE 2: PRESAS ---
@@ -66,10 +71,23 @@ impl Simulacion {
             nuevas_crias.extend(presa.reproducirse(&mut rng, &mut self.next_id));
         }
 
-        // --- FASE 3: CENSO Y LIMPIEZA ---
+        // --- FASE 3: CENSO Y LIMPIANZA ---
         // Se añaden las nuevas crías a la población.
         self.presas.extend(nuevas_crias);
         // Se eliminan de la lista todas las presas que han muerto en este día.
         self.presas.retain(|p| p.esta_viva());
+    }
+
+    /// Devuelve el número de conejos y cabras actualmente en la simulación.
+    pub fn contar_especies(&self) -> (usize, usize) {
+        let mut conejos = 0;
+        let mut cabras = 0;
+        for presa in &self.presas {
+            match presa.especie() {
+                Especie::Conejo => conejos += 1,
+                Especie::Cabra => cabras += 1,
+            }
+        }
+        (conejos, cabras)
     }
 }

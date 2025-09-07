@@ -12,32 +12,32 @@ use rand::rngs::ThreadRng; // Se importa el tipo concreto de generador de númer
 // Estas constantes actúan como "perillas" para ajustar el comportamiento del ecosistema.
 // =================================================
 
-// --- Población Inicial ---
-pub const N_CONEJOS_INICIAL: u32 = 40;
-pub const N_CABRAS_INICIAL: u32 = 15;
+// --- Población Inicial (AJUSTADO) ---
+pub const N_CONEJOS_INICIAL: u32 = 60; 
+pub const N_CABRAS_INICIAL: u32 = 25;
 
-// --- Parámetros del Depredador (AJUSTADOS) ---
-pub const DEPREDADOR_RESERVA_INICIAL_KG: f64 = 600.0; // Aumentado para sobrevivir la fase inicial
-pub const DEPREDADOR_CONSUMO_MINIMO_DIARIO_KG: f64 = 3.0; // Reducido
-pub const DEPREDADOR_CONSUMO_OPTIMO_DIARIO_KG: f64 = 6.0; // Reducido
+// --- Parámetros del Depredador ---
+pub const DEPREDADOR_RESERVA_INICIAL_KG: f64 = 900.0; 
+pub const DEPREDADOR_CONSUMO_MINIMO_DIARIO_KG: f64 = 3.0;
+pub const DEPREDADOR_CONSUMO_OPTIMO_DIARIO_KG: f64 = 5.0;
 
-// --- Parámetros de CONEJO (AJUSTADOS) ---
-const CONEJO_EDAD_MAXIMA_DIAS: u32 = 1825; // 5 años
-const CONEJO_EDAD_REPRODUCTIVA_DIAS: u32 = 120; // 4 meses
-const CONEJO_EDAD_SACRIFICIO_DIAS: u32 = 60;   // AJUSTADO: 2 meses (comida disponible antes)
-const CONEJO_TASA_REPRODUCCION_DIARIA: f64 = 0.05; // 5% de probabilidad
-const CONEJO_CRIAS_POR_PARTO: (u32, u32) = (3, 6); // Rango de crías
+// --- Parámetros de CONEJO (AJUSTADO) ---
+const CONEJO_EDAD_MAXIMA_DIAS: u32 = 1825;
+const CONEJO_EDAD_REPRODUCTIVA_DIAS: u32 = 100;
+const CONEJO_EDAD_SACRIFICIO_DIAS: u32 = 150;  
+const CONEJO_TASA_REPRODUCCION_DIARIA: f64 = 0.05;
+const CONEJO_CRIAS_POR_PARTO: (u32, u32) = (3, 6);
 
-// --- Parámetros de CABRA ---
-const CABRA_EDAD_MAXIMA_DIAS: u32 = 5475; // 15 años
-const CABRA_EDAD_REPRODUCTIVA_DIAS: u32 = 300; // 10 meses
-const CABRA_EDAD_SACRIFICIO_DIAS: u32 = 240;  // 8 meses
-const CABRA_TASA_REPRODUCCION_DIARIA: f64 = 0.01; // 1% de probabilidad
-const CABRA_CRIAS_POR_PARTO: (u32, u32) = (1, 2);  // Rango de crías
+// --- Parámetros de CABRA (AJUSTADO) ---
+const CABRA_EDAD_MAXIMA_DIAS: u32 = 5475;
+const CABRA_EDAD_REPRODUCTIVA_DIAS: u32 = 300;
+const CABRA_EDAD_SACRIFICIO_DIAS: u32 = 250;  
+const CABRA_TASA_REPRODUCCION_DIARIA: f64 = 0.01;
+const CABRA_CRIAS_POR_PARTO: (u32, u32) = (1, 2);
 
 // --- Probabilidades Comunes ---
-const PROBABILIDAD_ENFERMAR: f64 = 0.001; // 0.1%
-const PROBABILIDAD_NACER_MACHO: f64 = 0.5; // 50%
+const PROBABILIDAD_ENFERMAR: f64 = 0.001;
+const PROBABILIDAD_NACER_MACHO: f64 = 0.5;
 
 // =================================================
 // DEFINICIONES DE TIPOS (ENUMS, STRUCTS, TRAITS)
